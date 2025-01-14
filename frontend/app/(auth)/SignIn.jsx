@@ -9,11 +9,39 @@ const SignIn = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleSignUp = () => {
-    console.log('Email:', email, 'Password:', password);
-    // Add authentication logic here
-    router.push('/MainPage'); // Redirect to main home page after login
+  const handleSignIn = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/authentication/signin/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Sign-in successful!', data);
+        
+        // Save token for future authenticated requests
+        // Example: AsyncStorage for local storage
+        // await AsyncStorage.setItem('token', data.token);
+  
+        router.push('/MainPage'); // Redirect to the Main Page
+      } else {
+        const errorData = await response.json();
+        console.error('Sign-in failed:', errorData);
+        alert(errorData.error || 'Sign-in failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong. Please try again later.');
+    }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -32,7 +60,7 @@ const SignIn = () => {
         onChangeText={setPassword}
       />
       <View style={styles.buttomContainer}>
-        <CustomButton text="Sign In" onPress={handleSignUp} />
+        <CustomButton text="Sign In" onPress={handleSignIn} />
       </View>
       <View style={styles.linkContainer}>
         <Link href="/SignUp" style={styles.linkText}>

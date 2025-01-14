@@ -10,11 +10,34 @@ const SignUp = () => {
   const [password, setPassword] = useState('');
   const router = useRouter();
 
-  const handleSignUp = () => {
-    console.log('Name:', name, 'Email:', email, 'Password:', password);
-    // Add sign-up logic here
-    router.push('/SignIn'); // Redirect to login page after sign-up
+  const handleSignUp = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/authentication/signup/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password,
+        }),
+      });
+  
+      if (response.ok) {
+        console.log('Sign-up successful!');
+        router.push('/SignIn'); // Redirect to the Sign In page
+      } else {
+        const errorData = await response.json();
+        console.error('Sign-up failed:', errorData);
+        alert(errorData.error || 'Sign-up failed');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Something went wrong. Please try again later.');
+    }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -39,7 +62,7 @@ const SignUp = () => {
         onChangeText={setPassword}
       />
       <View style={styles.buttomContainer}>
-        <CustomButton text='Sign In' onPress={handleSignUp}  />
+        <CustomButton text='Sign Up' onPress={handleSignUp}  />
       </View>
       <View style={styles.linkContainer}>
         <Link href="/SignIn" style={styles.linkText}>
